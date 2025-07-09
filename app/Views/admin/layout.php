@@ -243,6 +243,11 @@
             } else {
                 console.warn('Tidak ada elemen .summernote di halaman ini!');
             }
+            if (typeof $.fn.summernote === 'undefined') {
+                console.error('Plugin Summernote TIDAK TERDETEKSI! Pastikan summernote-bs5.min.js termuat.');
+                alert('Gagal: Plugin Summernote tidak terdeteksi!\nCek koneksi internet atau pastikan CDN summernote-bs5.min.js termuat.');
+                return;
+            }
             try {
                 $('.summernote').summernote({
                     height: 200,
