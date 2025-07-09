@@ -498,7 +498,7 @@ $heroExists = $heroPath && file_exists($heroPath);
             if (cart.length === 0) {
                 html = '<p class="text-center">Keranjang kosong.</p>';
             } else {
-                html = '<table class="table"><thead><tr><th></th><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th><th></th></tr></thead><tbody>';
+                html = '<div class="table-responsive"><table class="table mb-0"><thead><tr><th></th><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th><th></th></tr></thead><tbody>';
                 cart.forEach((item, i) => {
                     const sub = item.price * item.qty;
                     total += sub;
@@ -511,7 +511,7 @@ $heroExists = $heroPath && file_exists($heroPath);
             <td><button class=\"btn btn-sm btn-danger btn-remove-cart\" data-idx=\"${i}\">Hapus</button></td>
         </tr>`;
                 });
-                html += '</tbody></table>';
+                html += '</tbody></table></div>';
             }
             document.getElementById('cartItems').innerHTML = html;
             document.getElementById('cartTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
