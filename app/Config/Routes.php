@@ -60,6 +60,9 @@ $routes->group('admin', ['filter' => 'auth'], static function ($routes) {
     $routes->GET('products/edit/(:num)', 'Admin\Product::edit/$1');
     $routes->POST('products/update/(:num)', 'Admin\Product::update/$1');
     $routes->GET('products/delete/(:num)', 'Admin\Product::delete/$1');
+    // Route AJAX untuk hapus gambar galeri dan update urutan galeri
+    $routes->POST('products/(:num)/delete-gallery-image', 'Admin\Product::deleteGalleryImage/$1');
+    $routes->POST('products/(:num)/update-gallery', 'Admin\Product::updateGallery/$1');
 });
 
 // ================= RUTE BARU =================

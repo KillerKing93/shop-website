@@ -159,17 +159,9 @@ class Product extends BaseController
         // Proses update gallery
         $galleryFiles = $this->request->getFiles();
         if ($galleryFiles && isset($galleryFiles['gallery']) && !empty($galleryFiles['gallery'][0]->getName())) {
-            // Hapus galeri lama
-            $oldGallery = json_decode($product->gallery);
-            if (is_array($oldGallery)) {
-                foreach ($oldGallery as $oldImage) {
-                    if (file_exists(ROOTPATH . 'public' . $oldImage)) {
-                        unlink(ROOTPATH . 'public' . $oldImage);
-                    }
-                }
-            }
-
-            $galleryPaths = [];
+            // Ambil galeri lama
+            $oldGallery = json_decode($product->gallery, true) ?: [];
+            $galleryPaths = $oldGallery;
             foreach ($galleryFiles['gallery'] as $file) {
                 if ($file->isValid() && !$file->hasMoved()) {
                     $galleryName = $file->getRandomName();
@@ -218,5 +210,73 @@ class Product extends BaseController
         } else {
             return redirect()->to('/admin/products')->with('error', 'Produk tidak ditemukan.');
         }
+    }
+
+    /**
+     * Hapus satu gambar dari galeri produk (AJAX)
+     */
+    public function deleteGalleryImage($productId)
+    {
+        $imageUrl = $this->request->getPost('image');
+        if (!$imageUrl) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gambar tidak ditemukan.'
+            ]);
+        }
+        $productModel = new ProductModel();
+        $product = $productModel->find($productId);
+        if (!$product) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Produk tidak ditemukan.'
+            ]);
+        }
+        $gallery = json_decode($product->gallery, true) ?: [];
+        $newGallery = array_filter($gallery, function ($img) use ($imageUrl) {
+            return $img !== $imageUrl;
+        });
+        // Hapus file fisik
+        $filePath = ROOTPATH . 'public' . $imageUrl;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        // Update database
+        $productModel->update($productId, [
+            'gallery' => json_encode(array_values($newGallery))
+        ]);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Gambar galeri dihapus.'
+        ]);
+    }
+
+    /**
+     * Update urutan galeri (opsional, jika frontend mendukung drag & drop)
+     */
+    public function updateGallery($productId)
+    {
+        $gallery = $this->request->getPost('gallery'); // array of image URLs
+        if (!is_array($gallery)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Data galeri tidak valid.'
+            ]);
+        }
+        $productModel = new ProductModel();
+        $product = $productModel->find($productId);
+        if (!$product) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Produk tidak ditemukan.'
+            ]);
+        }
+        $productModel->update($productId, [
+            'gallery' => json_encode($gallery)
+        ]);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Galeri diperbarui.'
+        ]);
     }
 }

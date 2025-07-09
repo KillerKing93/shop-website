@@ -131,9 +131,12 @@
                                                     <input class="form-control" type="file" name="gallery[]" multiple>
                                                     <?php $gallery = json_decode($product->gallery); ?>
                                                     <?php if (is_array($gallery)): ?>
-                                                        <div class="mt-2 d-flex flex-wrap">
+                                                        <div class="mt-2 d-flex flex-wrap gallery-list" data-product-id="<?= $product->id ?>">
                                                             <?php foreach ($gallery as $img): ?>
-                                                                <img src="<?= base_url($img) ?>" alt="Gallery" class="me-2 mb-2" style="max-width: 80px; max-height: 80px; object-fit: cover;">
+                                                                <div class="position-relative d-inline-block gallery-img-wrapper me-2 mb-2" data-img="<?= esc($img) ?>">
+                                                                    <img src="<?= base_url($img) ?>" alt="Gallery" style="max-width: 80px; max-height: 80px; object-fit: cover;">
+                                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-gallery position-absolute top-0 end-0" style="padding:2px 6px;z-index:2;">&times;</button>
+                                                                </div>
                                                             <?php endforeach; ?>
                                                         </div>
                                                     <?php endif; ?>
@@ -317,6 +320,45 @@
                 }
             });
         });
+    });
+
+    // Handler hapus gambar galeri
+    $(document).on('click', '.btn-remove-gallery', function() {
+        var $wrapper = $(this).closest('.gallery-img-wrapper');
+        var imgPath = $wrapper.data('img');
+        var $galleryList = $wrapper.closest('.gallery-list');
+        var productId = $galleryList.data('product-id');
+        if (!imgPath || !productId) return;
+        if (!confirm('Hapus gambar ini dari galeri?')) return;
+        fetch('<?= site_url('admin/products/delete-gallery-image/') ?>' + productId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                },
+                body: JSON.stringify({
+                    img: imgPath
+                })
+            })
+            .then(res => res.json ? res.json() : res)
+            .then(data => {
+                if (data.status === 'success') {
+                    $wrapper.remove();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Gambar dihapus!',
+                        timer: 900,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal hapus gambar',
+                        text: data.message || 'Terjadi kesalahan.'
+                    });
+                }
+            });
     });
 </script>
 
