@@ -66,20 +66,20 @@ $heroExists = $heroPath && file_exists($heroPath);
             <?php foreach ($products as $product): ?>
                 <?php $gallery = json_decode($product->gallery ?? '[]'); ?>
                 <div class="col product-item" data-id="<?= $product->id ?>" data-name="<?= strtolower(esc($product->name)) ?>" data-tags="<?= strtolower(esc($product->tags)) ?>" data-product='<?= json_encode(["id" => $product->id, "name" => $product->name, "price" => $product->price, "thumbnail" => $product->thumbnail, "description" => $product->description, "tags" => $product->tags, "gallery" => $gallery]) ?>'>
-                    <div class="card h-100 product-card">
-                        <img src="<?= base_url($product->thumbnail ?: 'https://placehold.co/600x400/cccccc/ffffff?text=Gambar+Produk') ?>" class="card-img-top" alt="<?= esc($product->name) ?>">
+                    <div class="card h-100 product-card d-flex flex-column">
+                        <img src="<?= base_url($product->thumbnail ?: 'https://placehold.co/600x400/cccccc/ffffff?text=Gambar+Produk') ?>" class="card-img-top product-img" alt="<?= esc($product->name) ?>">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title mb-1"><?= esc($product->name) ?></h5>
-                            <p class="card-text fw-bold text-primary mb-1">Rp <?= number_format($product->price, 0, ',', '.') ?></p>
-                            <div class="mb-2">
+                            <h5 class="card-title mb-1 text-truncate" title="<?= esc($product->name) ?>"><?= esc($product->name) ?></h5>
+                            <p class="card-text fw-bold text-primary mb-1" style="min-height:24px;">Rp <?= number_format($product->price, 0, ',', '.') ?></p>
+                            <div class="mb-2" style="min-height:28px;">
                                 <?php if (!empty($product->tags)): ?>
                                     <?php foreach (explode(',', $product->tags) as $tag): ?>
                                         <span class="badge bg-secondary me-1 mb-1"><?= trim($tag) ?></span>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
-                            <p class="card-text small mb-2" style="min-height:40px;max-height:40px;overflow:hidden;"> <?= esc(mb_strimwidth($product->description, 0, 60, '...')) ?> </p>
-                            <div class="input-group mb-2" style="max-width:140px;margin:auto;">
+                            <p class="card-text small mb-2 product-desc" title="<?= esc($product->description) ?>"> <?= esc(mb_strimwidth($product->description, 0, 60, '...')) ?> </p>
+                            <div class="input-group mb-2 justify-content-center" style="max-width:140px;margin:auto;">
                                 <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
                                 <input type="number" class="form-control text-center qty-input" value="1" min="1" style="max-width:50px;">
                                 <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
@@ -165,19 +165,45 @@ $heroExists = $heroPath && file_exists($heroPath);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    .carousel-control-prev-icon::after,
-    .carousel-control-next-icon::after {
-        content: '';
+    .product-img {
+        height: 180px;
+        object-fit: contain;
+        width: 100%;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+        padding: 8px 0;
     }
 
-    .carousel-control-prev-icon {
-        mask: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'black\' viewBox=\'0 0 16 16\'><path d=\'M11 1.5a.5.5 0 0 1 0 .707L6.207 7l4.793 4.793a.5.5 0 0 1-.707.707l-5-5a.5.5 0 0 1 0-.707l5-5a.5.5 0 0 1 .707 0z\'/></svg>') center/60% 60% no-repeat;
-        -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'black\' viewBox=\'0 0 16 16\'><path d=\'M11 1.5a.5.5 0 0 1 0 .707L6.207 7l4.793 4.793a.5.5 0 0 1-.707.707l-5-5a.5.5 0 0 1 0-.707l5-5a.5.5 0 0 1 .707 0z\'/></svg>') center/60% 60% no-repeat;
+    .product-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .carousel-control-next-icon {
-        mask: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'black\' viewBox=\'0 0 16 16\'><path d=\'M5 1.5a.5.5 0 0 1 .707 0l5 5a.5.5 0 0 1 0 .707l-5 5a.5.5 0 0 1-.707-.707L9.793 7 5 2.207a.5.5 0 0 1 0-.707z\'/></svg>') center/60% 60% no-repeat;
-        -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'black\' viewBox=\'0 0 16 16\'><path d=\'M5 1.5a.5.5 0 0 1 .707 0l5 5a.5.5 0 0 1 0 .707l-5 5a.5.5 0 0 1-.707-.707L9.793 7 5 2.207a.5.5 0 0 1 0-.707z\'/></svg>') center/60% 60% no-repeat;
+    .product-card .product-desc {
+        min-height: 36px;
+        max-height: 36px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-card .card-body {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding-bottom: 0.5rem;
+    }
+
+    .product-card .input-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .product-card .btn-add-cart {
+        margin-bottom: 0.25rem;
     }
 
     @media (max-width: 767px) {
@@ -193,6 +219,10 @@ $heroExists = $heroPath && file_exists($heroPath);
 
         #tagFilters {
             font-size: 0.95rem;
+        }
+
+        .product-img {
+            height: 140px;
         }
     }
 
