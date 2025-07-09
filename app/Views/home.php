@@ -18,13 +18,9 @@ $heroExists = $heroPath && file_exists($heroPath);
 </div>
 
 <!-- Floating Cart Button (pojok kanan bawah, dengan logo SVG keranjang custom) -->
-<button id="cartBtn" class="btn btn-primary position-fixed shadow-lg d-flex align-items-center justify-content-center" style="bottom:30px;right:30px;z-index:1050;border-radius:50%;width:60px;height:60px;padding:0;">
-    <span style="position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;">
-        <!-- SVG keranjang custom, gold -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="gold" viewBox="0 0 16 16">
-            <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 14H4a.5.5 0 0 1-.491-.408L1.01 2H.5a.5.5 0 0 1-.5-.5zm3.14 4l1.25 6.25A.5.5 0 0 0 4.86 12h7.28a.5.5 0 0 0 .47-.75L12.86 5H3.14z" />
-        </svg>
-        <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.9rem;">0</span>
+<button id="cartBtn" class="btn btn-primary position-fixed shadow-lg d-flex align-items-center justify-content-center" style="bottom:30px;right:30px;z-index:1050;border-radius:50%;width:64px;height:64px;padding:0;">
+    <span style="position:relative;display:flex;align-items:center;justify-content:center;width:52px;height:52px;">
+        <!-- SVG/gambar keranjang akan diisi via JS -->
     </span>
 </button>
 
@@ -211,7 +207,6 @@ $heroExists = $heroPath && file_exists($heroPath);
     }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -416,14 +411,17 @@ $heroExists = $heroPath && file_exists($heroPath);
 
         function updateCartCount() {
             const cart = getCart();
-            document.getElementById('cartCount').innerText = cart.reduce((a, b) => a + b.qty, 0);
+            var badge = document.getElementById('cartCount');
+            if (badge) {
+                badge.innerText = cart.reduce((a, b) => a + b.qty, 0);
+            }
         }
         updateCartCount();
 
         // --- Cart Button Floating ---
-        document.getElementById('cartBtn').onclick = function(e) {
-            e.preventDefault();
-            // Show cart modal
+        var cartBtn = document.getElementById('cartBtn');
+
+        function showCartModal() {
             const cart = getCart();
             let html = '';
             let total = 0;
@@ -435,13 +433,13 @@ $heroExists = $heroPath && file_exists($heroPath);
                     const sub = item.price * item.qty;
                     total += sub;
                     html += `<tr>
-                <td><img src=\"<?= base_url() ?>${item.thumbnail}\" style=\"width:50px;height:50px;object-fit:cover;\"></td>
-                <td>${item.name}</td>
-                <td>Rp ${item.price.toLocaleString('id-ID')}</td>
-                <td>${item.qty}</td>
-                <td>Rp ${(sub).toLocaleString('id-ID')}</td>
-                <td><button class="btn btn-sm btn-danger btn-remove-cart" data-idx="${i}">Hapus</button></td>
-            </tr>`;
+            <td><img src=\"<?= base_url() ?>${item.thumbnail}\" style=\"width:50px;height:50px;object-fit:cover;\"></td>
+            <td>${item.name}</td>
+            <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+            <td>${item.qty}</td>
+            <td>Rp ${(sub).toLocaleString('id-ID')}</td>
+            <td><button class=\"btn btn-sm btn-danger btn-remove-cart\" data-idx=\"${i}\">Hapus</button></td>
+        </tr>`;
                 });
                 html += '</tbody></table>';
             }
@@ -463,11 +461,36 @@ $heroExists = $heroPath && file_exists($heroPath);
                     let cart = getCart();
                     cart.splice(idx, 1);
                     setCart(cart);
-                    // Reopen modal after remove
-                    document.getElementById('cartBtn').click();
+                    showCartModal();
                 };
             });
-        };
+        }
+        if (cartBtn) {
+            function updateCartIcon() {
+                var cart = [];
+                try {
+                    cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                } catch (e) {}
+                var iconEmpty = `<img src="<?= base_url('assets/icon/shopping-cart.png') ?>" alt="Keranjang Kosong" style="width:52px;height:52px;vertical-align:middle;">`;
+                var iconFilled = `<img src="<?= base_url('assets/icon/shopping-cart-filled.png') ?>" alt="Keranjang Berisi" style="width:52px;height:52px;vertical-align:middle;">`;
+                cartBtn.querySelector('span').innerHTML = (cart && cart.length > 0 ? iconFilled : iconEmpty) + '<span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">' + (cart && cart.length ? cart.reduce((a, b) => a + b.qty, 0) : 0) + '</span>';
+            }
+            updateCartIcon();
+            window.addEventListener('storage', updateCartIcon);
+            setInterval(updateCartIcon, 1000);
+            // Only assign the modal handler ONCE and do not overwrite
+            cartBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showCartModal();
+            });
+        }
+
+        document.querySelector('.navbar-toggler').addEventListener('click', function() {
+            setTimeout(function() {
+                var nav = document.getElementById('navbarNav');
+                console.log('NavbarNav class:', nav.className, 'display:', getComputedStyle(nav).display);
+            }, 400);
+        });
     });
 </script>
 

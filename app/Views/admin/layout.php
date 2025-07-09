@@ -29,7 +29,20 @@
             background: #343a40;
             color: white;
             position: fixed;
-            height: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            transition: margin-left 0.3s, padding-top 0.2s;
+            padding-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .sidebar h4 {
+            margin-top: 60px;
+            margin-bottom: 1.5rem;
+            transition: margin-top 0.2s;
         }
 
         .sidebar a {
@@ -50,6 +63,7 @@
             width: calc(100% - 250px);
             padding: 2rem;
             flex: 1 0 auto;
+            padding-top: 64px;
         }
 
         .footer-admin {
@@ -58,12 +72,108 @@
             margin-top: auto;
             text-align: center;
             padding: 1rem 0;
+            margin-left: 250px;
+            transition: margin-left 0.3s;
+        }
+
+        .sidebar-collapsed .sidebar {
+            margin-left: -250px;
+        }
+
+        .sidebar-collapsed .content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 1101;
+            background: #343a40;
+            color: #ffc107;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar-toggle-btn:focus,
+        .sidebar-toggle-btn:hover {
+            color: #ffc107;
+            background: #495057;
+            outline: 2px solid #ffc107;
+        }
+
+        body.sidebar-collapsed .sidebar-toggle-btn {
+            background: #343a40;
+            color: #ffc107;
+        }
+
+        body.sidebar-collapsed .sidebar h4 {
+            margin-top: 40px;
+        }
+
+        .footer-admin {
+            background-color: #343a40;
+            color: white;
+            margin-top: auto;
+            text-align: center;
+            padding: 1rem 0;
+            margin-left: 250px;
+            transition: margin-left 0.3s;
+        }
+
+        body.sidebar-collapsed .footer-admin {
+            margin-left: 0;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 200px;
+                padding-top: 40px;
+            }
+
+            .sidebar-collapsed .sidebar {
+                margin-left: -200px;
+            }
+
+            .content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+                padding-top: 72px;
+            }
+
+            .sidebar-collapsed .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .footer-admin {
+                margin-left: 200px;
+            }
+
+            body.sidebar-collapsed .footer-admin {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 
 <body>
-
+    <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Sidebar" type="button">
+        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <rect width="16" height="2" y="2" rx="1" />
+            <rect width="16" height="2" y="7" rx="1" />
+            <rect width="16" height="2" y="12" rx="1" />
+        </svg>
+    </button>
     <div class="sidebar d-flex flex-column p-3">
         <h4 class="text-center mb-4">
             <a href="<?= site_url('/') ?>" class="text-white text-decoration-none">
@@ -209,6 +319,25 @@
                 })
             });
         });
+    </script>
+    <script>
+        // Sidebar toggle (vanilla JS, always works, no nested DOMContentLoaded)
+        var btn = document.getElementById('sidebarToggle');
+
+        function setSidebarDefault() {
+            if (window.innerWidth <= 991) {
+                document.body.classList.add('sidebar-collapsed');
+            } else {
+                document.body.classList.remove('sidebar-collapsed');
+            }
+        }
+        setSidebarDefault();
+        window.addEventListener('resize', setSidebarDefault);
+        if (btn) {
+            btn.addEventListener('click', function() {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+        }
     </script>
 </body>
 

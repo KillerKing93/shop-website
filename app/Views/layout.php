@@ -73,7 +73,7 @@
                 endif; ?>
                 <?= esc($settings->site_name) ?>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -156,6 +156,27 @@
         }
         window.addEventListener('load', adjustFooter);
         window.addEventListener('resize', adjustFooter);
+    </script>
+
+    <script>
+        // Keranjang icon pakai assets lokal (tidak diubah)
+        document.addEventListener('DOMContentLoaded', function() {
+            var cartBtn = document.getElementById('cartBtn');
+            if (cartBtn) {
+                function updateCartIcon() {
+                    var cart = [];
+                    try {
+                        cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    } catch (e) {}
+                    var iconEmpty = `<img src="<?= base_url('assets/icon/shopping-cart.png') ?>" alt="Keranjang Kosong" style="width:28px;height:28px;vertical-align:middle;">`;
+                    var iconFilled = `<img src="<?= base_url('assets/icon/shopping-cart-filled.png') ?>" alt="Keranjang Berisi" style="width:28px;height:28px;vertical-align:middle;">`;
+                    cartBtn.innerHTML = (cart && cart.length > 0 ? iconFilled : iconEmpty) + '<span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">' + (cart && cart.length ? cart.reduce((a, b) => a + b.qty, 0) : 0) + '</span>';
+                }
+                updateCartIcon();
+                window.addEventListener('storage', updateCartIcon);
+                setInterval(updateCartIcon, 1000); // fallback jika cart berubah tanpa event
+            }
+        });
     </script>
 
 </body>
