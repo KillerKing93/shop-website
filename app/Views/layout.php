@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if (!empty($settings->logo_url) && file_exists(FCPATH . ltrim($settings->logo_url, '/'))): ?>
+        <link rel="icon" type="image/png" href="<?= base_url($settings->logo_url) . '?v=' . time() ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="<?= base_url('favicon.ico') ?>">
+    <?php endif; ?>
     <title><?= esc($title ?? $settings->site_name) ?></title>
 
     <!-- Bootstrap CSS -->
