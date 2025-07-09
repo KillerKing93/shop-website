@@ -8,51 +8,34 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\SettingModel;
 
-/**
- * Class BaseController
- *
- * BaseController provides a convenient place for loading components
- * and performing functions that are needed by all your controllers.
- * Extend this class in any new controllers:
- *     class Home extends BaseController
- *
- * For security be sure to declare any new methods as protected or private.
- */
 abstract class BaseController extends Controller
 {
-    /**
-     * Instance of the main Request object.
-     *
-     * @var CLIRequest|IncomingRequest
-     */
     protected $request;
+    protected $helpers = ['url', 'form', 'text'];
+    protected $session;
 
-    /**
-     * An array of helpers to be loaded automatically upon
-     * class instantiation. These helpers will be available
-     * to all other controllers that extend BaseController.
-     *
-     * @var list<string>
-     */
-    protected $helpers = [];
-
-    /**
-     * Be sure to declare properties for any property fetch you initialized.
-     * The creation of dynamic property is deprecated in PHP 8.2.
-     */
-    // protected $session;
-
-    /**
-     * @return void
-     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // Do Not Edit This Line
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
+        // Pastikan direktori database ada
+        $dbPath = WRITEPATH . 'database';
+        if (!is_dir($dbPath)) {
+            mkdir($dbPath, 0775, true);
+        }
 
-        // E.g.: $this->session = service('session');
+        $this->session = \Config\Services::session();
+
+        // Pastikan folder upload logo & hero selalu ada
+        $logoDir = ROOTPATH . 'public/uploads/logos';
+        if (!is_dir($logoDir)) {
+            mkdir($logoDir, 0777, true);
+        }
+        $heroDir = ROOTPATH . 'public/uploads/heros';
+        if (!is_dir($heroDir)) {
+            mkdir($heroDir, 0777, true);
+        }
     }
 }
