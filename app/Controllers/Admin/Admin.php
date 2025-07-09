@@ -186,6 +186,74 @@ class Admin extends BaseController
         $logoFile = $this->request->getFile('logo');
         $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 
+        // Jika request AJAX, selalu return JSON
+        if ($this->request->isAJAX()) {
+            if (!$logoFile) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Tidak ada file logo yang dikirim.'
+                ]);
+            }
+            if (!$logoFile->isValid()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'File logo tidak valid: ' . $logoFile->getErrorString()
+                ]);
+            }
+            if (!in_array($logoFile->getMimeType(), $allowedTypes)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Logo harus berupa gambar (jpg, jpeg, png, webp).'
+                ]);
+            }
+            if ($logoFile->getSize() > 1024 * 1024) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Logo maksimal 1MB.'
+                ]);
+            }
+
+            $logoDir = ROOTPATH . 'public/uploads/logos';
+            if (!is_dir($logoDir)) {
+                mkdir($logoDir, 0777, true);
+            }
+            $logoName = $logoFile->getRandomName();
+            if (!$logoFile->move($logoDir, $logoName)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal upload logo: ' . $logoFile->getErrorString()
+                ]);
+            }
+
+            // Hapus logo lama jika ada dan bukan default
+            if (!empty($currentConfig['logo_url']) && file_exists(ROOTPATH . 'public' . $currentConfig['logo_url'])) {
+                if (basename($currentConfig['logo_url']) != 'default-logo.png') {
+                    @unlink(ROOTPATH . 'public' . $currentConfig['logo_url']);
+                }
+            }
+
+            // Update config dan simpan ke database
+            $currentConfig['logo_url'] = '/uploads/logos/' . $logoName;
+            $result = $settingModel->saveWebsiteConfig($currentConfig);
+
+            // Debug: cek hasil update
+            $after = $settingModel->getWebsiteConfig();
+            file_put_contents(WRITEPATH . 'logs/logo_upload_debug.txt', date('c') . " after upload: " . print_r($after, true) . "\n", FILE_APPEND);
+
+            if (isset($after->logo_url) && $after->logo_url === $currentConfig['logo_url']) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Logo berhasil diupload dan diperbarui.',
+                    'logo_url' => $after->logo_url
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Logo berhasil diupload, tapi path tidak terupdate di database! Cek log debug.'
+                ]);
+            }
+        }
+        // Jika bukan AJAX, fallback ke redirect lama
         if (!$logoFile) {
             return redirect()->back()->with('error', 'Tidak ada file logo yang dikirim.');
         }
