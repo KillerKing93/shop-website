@@ -66,7 +66,6 @@
                         <th>Thumbnail</th>
                         <th>Nama Produk</th>
                         <th>Harga</th>
-                        <th>Deskripsi</th>
                         <th>Tanggal Dibuat</th>
                         <th>Aksi</th>
                     </tr>
@@ -80,12 +79,8 @@
                                 </td>
                                 <td class="product-name"><?= esc($product->name) ?></td>
                                 <td class="product-price">Rp <?= number_format($product->price, 0, ',', '.') ?></td>
-                                <td class="product-desc-short" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                    <?= strip_tags(mb_strimwidth($product->description, 0, 60, '...')) ?>
-                                </td>
                                 <td><?= date('d M Y', strtotime($product->created_at)) ?></td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning edit-desc-btn" data-id="<?= $product->id ?>" data-desc="<?= htmlspecialchars($product->description) ?>">Edit Deskripsi</button>
                                     <button class="btn btn-sm btn-warning edit-product-btn" data-id="<?= $product->id ?>">Edit</button>
                                     <a href="<?= site_url('admin/products/delete/' . $product->id) ?>" class="btn btn-sm btn-danger delete-button">Hapus</a>
                                 </td>
@@ -157,29 +152,6 @@
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit Deskripsi Produk -->
-<div class="modal fade" id="editDescModal" tabindex="-1" aria-labelledby="editDescModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editDescModalLabel">Edit Deskripsi Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editDescForm">
-                    <?= csrf_field() ?>
-                    <input type="hidden" id="editDescProductId" name="id">
-                    <textarea class="form-control summernote" id="editDescTextarea" name="description"></textarea>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="saveDescBtn">Simpan</button>
-            </div>
         </div>
     </div>
 </div>
@@ -296,71 +268,6 @@
             const editRow = document.getElementById('edit-form-row-' + id);
             if (editRow) editRow.style.display = name.includes(val) ? editRow.style.display : 'none';
         });
-    });
-
-    // Edit Deskripsi Produk dengan Summernote
-    let editDescModal = null;
-    let summernoteInstance = null;
-    document.querySelectorAll('.edit-desc-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const productId = btn.getAttribute('data-id');
-            const desc = btn.getAttribute('data-desc');
-            document.getElementById('editDescProductId').value = productId;
-            document.getElementById('editDescTextarea').value = desc;
-            if (summernoteInstance) {
-                $('#editDescTextarea').summernote('destroy');
-            }
-            // Inisialisasi Summernote di modal
-            $('#editDescTextarea').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
-            summernoteInstance = true;
-            editDescModal = new bootstrap.Modal(document.getElementById('editDescModal'));
-            editDescModal.show();
-        });
-    });
-
-    document.getElementById('saveDescBtn').addEventListener('click', function() {
-        const productId = document.getElementById('editDescProductId').value;
-        const desc = $('#editDescTextarea').summernote('code');
-        const formData = new FormData();
-        formData.append('description', desc);
-        formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-        fetch('<?= site_url('admin/products/update-desc/') ?>' + productId, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(res => res.json ? res.json() : res)
-            .then(data => {
-                if (data.status === 'success') {
-                    // Update deskripsi di tabel
-                    const row = document.querySelector('tr[data-product-id="' + productId + '"] .product-desc-short');
-                    if (row) row.textContent = $("<div>" + desc + "</div>").text().substring(0, 60) + '...';
-                    editDescModal.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deskripsi diperbarui!',
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal update deskripsi',
-                        text: data.message || 'Terjadi kesalahan.'
-                    });
-                }
-            });
     });
 </script>
 
