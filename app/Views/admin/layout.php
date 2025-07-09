@@ -237,17 +237,28 @@
 
     <script>
         $(document).ready(function() {
-            // Inisialisasi Summernote
-            $('.summernote').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
+            console.log('jQuery ready, mencoba inisialisasi Summernote...');
+            if ($('.summernote').length) {
+                console.log('Elemen .summernote ditemukan:', $('.summernote').length);
+            } else {
+                console.warn('Tidak ada elemen .summernote di halaman ini!');
+            }
+            try {
+                $('.summernote').summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
+                console.log('Inisialisasi Summernote berhasil!');
+            } catch (e) {
+                console.error('Gagal inisialisasi Summernote:', e);
+                alert('Gagal inisialisasi Summernote: ' + e);
+            }
 
             // Notifikasi Session
             <?php if (session()->getFlashdata('message')): ?>

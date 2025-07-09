@@ -78,7 +78,7 @@ $heroExists = $heroPath && file_exists($heroPath);
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
-                            <p class="card-text small mb-2 product-desc" title="<?= esc($product->description) ?>"> <?= esc(mb_strimwidth($product->description, 0, 60, '...')) ?> </p>
+                            <p class="card-text small mb-2 product-desc-html" title="<?= strip_tags($product->description) ?>"> <?= mb_strimwidth($product->description, 0, 120, '...') ?> </p>
                             <div class="input-group mb-2 justify-content-center" style="max-width:140px;margin:auto;">
                                 <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
                                 <input type="number" class="form-control text-center qty-input" value="1" min="1" style="max-width:50px;">
@@ -234,6 +234,29 @@ $heroExists = $heroPath && file_exists($heroPath);
 
     #tagFilters .form-check {
         margin-bottom: 0;
+    }
+
+    .product-desc-html {
+        font-size: 0.97rem;
+        line-height: 1.5;
+        min-height: 36px;
+        max-height: 36px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-desc-html p {
+        margin-bottom: 0.5em;
+    }
+
+    .product-desc-html strong {
+        font-weight: bold;
+    }
+
+    .product-desc-html em {
+        font-style: italic;
     }
 </style>
 

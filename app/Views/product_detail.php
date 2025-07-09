@@ -36,7 +36,7 @@
 
             <div class="mb-4">
                 <strong>Deskripsi:</strong>
-                <div><?= $product->description ?></div>
+                <p id="detailDesc" class="product-desc-html"></p>
             </div>
 
             <hr>
@@ -105,6 +105,28 @@ Mohon informasinya. Terima kasih.`;
 
             window.open(whatsappUrl, '_blank');
         });
+
+        // Ganti innerText menjadi innerHTML untuk deskripsi
+        document.getElementById('detailDesc').innerHTML = prod.description || '-';
     });
 </script>
+<style>
+    .product-desc-html {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .product-desc-html p {
+        margin-bottom: 0.5em;
+    }
+
+    .product-desc-html strong {
+        font-weight: bold;
+    }
+
+    .product-desc-html em {
+        font-style: italic;
+    }
+</style>
 <?= $this->endSection() ?>
