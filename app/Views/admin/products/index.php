@@ -113,7 +113,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Deskripsi Produk</label>
-                                            <textarea class="form-control" name="description" rows="3"><?= esc($product->description) ?></textarea>
+                                            <textarea class="form-control summernote" name="description" rows="3"><?= esc($product->description) ?></textarea>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
