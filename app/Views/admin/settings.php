@@ -211,6 +211,7 @@
                             title: 'Gagal upload logo',
                             text: (data.message || 'Terjadi kesalahan.')
                         });
+                        console.log(data); // log error detail ke console
                     }
                 });
         });
