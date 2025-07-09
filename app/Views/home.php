@@ -79,12 +79,14 @@ $heroExists = $heroPath && file_exists($heroPath);
                                 <?php endif; ?>
                             </div>
                             <p class="card-text small mb-2 product-desc-html" title="<?= strip_tags($product->description) ?>"> <?= mb_strimwidth($product->description, 0, 120, '...') ?> </p>
-                            <div class="input-group mb-2 justify-content-center" style="max-width:140px;margin:auto;">
-                                <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
-                                <input type="number" class="form-control text-center qty-input" value="1" min="1" style="max-width:50px;">
-                                <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
+                            <div class="product-actions mt-auto d-flex flex-column align-items-center gap-2">
+                                <div class="input-group justify-content-center" style="max-width:140px;">
+                                    <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
+                                    <input type="number" class="form-control text-center qty-input" value="1" min="1" style="max-width:50px;">
+                                    <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
+                                </div>
+                                <button class="btn btn-success w-100 btn-add-cart"><i class="bi bi-cart-plus"></i> Tambahkan ke Keranjang</button>
                             </div>
-                            <button class="btn btn-success w-100 btn-add-cart mt-auto"><i class="bi bi-cart-plus"></i> Tambahkan ke Keranjang</button>
                             <button class="btn btn-link btn-detail mt-2" data-id="<?= $product->id ?>">Lihat Detail</button>
                         </div>
                     </div>
@@ -196,6 +198,7 @@ $heroExists = $heroPath && file_exists($heroPath);
         flex-direction: column;
         align-items: stretch;
         padding-bottom: 0.5rem;
+        min-height: 320px;
     }
 
     .product-card .input-group {
@@ -204,6 +207,19 @@ $heroExists = $heroPath && file_exists($heroPath);
 
     .product-card .btn-add-cart {
         margin-bottom: 0.25rem;
+    }
+
+    .product-actions {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .product-actions .input-group {
+        margin-bottom: 0;
     }
 
     @media (max-width: 767px) {
@@ -245,6 +261,7 @@ $heroExists = $heroPath && file_exists($heroPath);
         text-overflow: ellipsis;
         white-space: nowrap;
         margin-bottom: 0.5rem;
+        flex-shrink: 0;
     }
 
     .product-desc-html p {
