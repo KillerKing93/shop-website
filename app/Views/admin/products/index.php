@@ -269,6 +269,55 @@
             if (editRow) editRow.style.display = name.includes(val) ? editRow.style.display : 'none';
         });
     });
+
+    // Inisialisasi Summernote dengan auto-save onBlur untuk form edit inline
+    $(document).ready(function() {
+        $('.edit-form-row .summernote').each(function() {
+            var $textarea = $(this);
+            $textarea.summernote({
+                height: 200,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                callbacks: {
+                    onBlur: function() {
+                        var $form = $textarea.closest('form');
+                        $textarea.val($textarea.summernote('code'));
+                        const id = $form.data('id');
+                        const formData = new FormData($form[0]);
+                        fetch('<?= site_url('admin/products/update/') ?>' + id, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(res => res.json ? res.json() : res)
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Produk diperbarui!',
+                                        timer: 1000,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal update',
+                                        text: data.message || 'Terjadi kesalahan.'
+                                    });
+                                }
+                            });
+                    }
+                }
+            });
+        });
+    });
 </script>
 
 <?= $this->endSection() ?>
