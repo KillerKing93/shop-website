@@ -245,7 +245,7 @@
             }
             if (typeof $.fn.summernote === 'undefined') {
                 console.error('Plugin Summernote TIDAK TERDETEKSI! Pastikan summernote-bs5.min.js termuat.');
-                alert('Gagal: Plugin Summernote tidak terdeteksi!\nCek koneksi internet atau pastikan CDN summernote-bs5.min.js termuat.');
+                // Hilangkan alert agar tidak mengganggu admin
                 return;
             }
             try {
