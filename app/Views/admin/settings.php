@@ -190,9 +190,15 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(res => res.json ? res.json() : res)
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => {
+                            throw new Error('HTTP ' + res.status + ': ' + text);
+                        });
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    // SweetAlert selalu muncul
                     if (data.status === 'success' || (data.message && data.message.includes('berhasil'))) {
                         Swal.fire({
                             icon: 'success',
@@ -211,8 +217,16 @@
                             title: 'Gagal upload logo',
                             text: (data.message || 'Terjadi kesalahan.')
                         });
-                        console.log(data); // log error detail ke console
+                        console.log(data);
                     }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal upload logo',
+                        text: err.message
+                    });
+                    console.error('Upload logo error:', err);
                 });
         });
     }
