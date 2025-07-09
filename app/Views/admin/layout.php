@@ -11,6 +11,12 @@
     <!-- Summernote CSS -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.css" rel="stylesheet">
 
+    <?php if (!empty($settings->logo_url) && file_exists(FCPATH . ltrim($settings->logo_url, '/'))): ?>
+        <link rel="icon" type="image/png" href="<?= base_url($settings->logo_url) . '?v=' . time() ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="<?= base_url('favicon.ico') ?>">
+    <?php endif; ?>
+
     <style>
         html,
         body {
